@@ -118,6 +118,7 @@ El proyecto implementa la lectura de un procedimiento almacenado de Oracle usand
 ### Testing:
 - **Tests unitarios completos:** `ClienteStoredProcedureRepositoryTest` con 8 escenarios de prueba
 - **Cobertura de casos:** Cliente encontrado, no encontrado, sin cuentas, sin solicitudes, excepciones
+- **BDD Mockito:** Uso de `given()` en lugar de `when()` para mejor legibilidad
 - **Mocks optimizados:** Uso de Mockito para simular EntityManager y ResultSet
 - **Verificación de comportamiento:** Validación de llamadas a métodos y procesamiento de datos
 
@@ -130,6 +131,12 @@ El proyecto implementa la lectura de un procedimiento almacenado de Oracle usand
 6. **Excepción general:** Manejo de errores inesperados
 7. **Múltiples cuentas:** Procesamiento de más de una cuenta bancaria
 8. **Múltiples solicitudes:** Procesamiento de más de una solicitud pendiente
+
+#### BDD Mockito implementado:
+- **given() en lugar de when():** Sintaxis más legible y expresiva
+- **willReturn() en lugar de thenReturn():** Consistencia con BDD
+- **willThrow() en lugar de thenThrow():** Manejo de excepciones más claro
+- **Mejor legibilidad:** Los tests son más fáciles de entender y mantener
 
 ### Configuración del proyecto:
 - **Git ignore optimizado:** Archivo `.gitignore` completo que excluye archivos innecesarios

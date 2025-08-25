@@ -19,7 +19,8 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.BDDMockito.*;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ClienteStoredProcedureRepository Tests")
@@ -48,16 +49,16 @@ class ClienteStoredProcedureRepositoryTest {
   @BeforeEach
   void setUp() {
     // Configuración común para todos los tests
-    when(entityManager.createStoredProcedureQuery(anyString())).thenReturn(storedProcedureQuery);
+    given(entityManager.createStoredProcedureQuery(anyString())).willReturn(storedProcedureQuery);
   }
 
   @Test
   @DisplayName("Debería consultar cliente por DNI exitosamente")
   void deberiaConsultarClientePorDNIExitosamente() throws SQLException {
     // Arrange
-    when(storedProcedureQuery.registerStoredProcedureParameter(anyString(), any(), any()))
-        .thenReturn(storedProcedureQuery);
-    when(storedProcedureQuery.setParameter(anyString(), any())).thenReturn(storedProcedureQuery);
+    given(storedProcedureQuery.registerStoredProcedureParameter(anyString(), any(), any()))
+        .willReturn(storedProcedureQuery);
+    given(storedProcedureQuery.setParameter(anyString(), any())).willReturn(storedProcedureQuery);
     configurarResultSetCliente();
     configurarResultSetCuentas();
     configurarResultSetSolicitudes();
@@ -94,11 +95,11 @@ class ClienteStoredProcedureRepositoryTest {
   @DisplayName("Debería lanzar excepción cuando no se encuentra el cliente")
   void deberiaLanzarExcepcionCuandoNoSeEncuentraCliente() throws SQLException {
     // Arrange
-    when(storedProcedureQuery.registerStoredProcedureParameter(anyString(), any(), any()))
-        .thenReturn(storedProcedureQuery);
-    when(storedProcedureQuery.setParameter(anyString(), any())).thenReturn(storedProcedureQuery);
-    when(storedProcedureQuery.getOutputParameterValue("rs1")).thenReturn(clienteResultSet);
-    when(clienteResultSet.next()).thenReturn(false); // No hay datos del cliente
+    given(storedProcedureQuery.registerStoredProcedureParameter(anyString(), any(), any()))
+        .willReturn(storedProcedureQuery);
+    given(storedProcedureQuery.setParameter(anyString(), any())).willReturn(storedProcedureQuery);
+    given(storedProcedureQuery.getOutputParameterValue("rs1")).willReturn(clienteResultSet);
+    given(clienteResultSet.next()).willReturn(false); // No hay datos del cliente
 
     // Act & Assert
     RuntimeException exception = assertThrows(RuntimeException.class, () -> {
@@ -112,12 +113,12 @@ class ClienteStoredProcedureRepositoryTest {
   @DisplayName("Debería manejar cliente sin cuentas bancarias")
   void deberiaManejarClienteSinCuentasBancarias() throws SQLException {
     // Arrange
-    when(storedProcedureQuery.registerStoredProcedureParameter(anyString(), any(), any()))
-        .thenReturn(storedProcedureQuery);
-    when(storedProcedureQuery.setParameter(anyString(), any())).thenReturn(storedProcedureQuery);
+    given(storedProcedureQuery.registerStoredProcedureParameter(anyString(), any(), any()))
+        .willReturn(storedProcedureQuery);
+    given(storedProcedureQuery.setParameter(anyString(), any())).willReturn(storedProcedureQuery);
     configurarResultSetCliente();
-    when(storedProcedureQuery.getOutputParameterValue("rs2")).thenReturn(cuentasResultSet);
-    when(cuentasResultSet.next()).thenReturn(false); // No hay cuentas bancarias
+    given(storedProcedureQuery.getOutputParameterValue("rs2")).willReturn(cuentasResultSet);
+    given(cuentasResultSet.next()).willReturn(false); // No hay cuentas bancarias
     configurarResultSetSolicitudes();
 
     // Act
@@ -134,13 +135,13 @@ class ClienteStoredProcedureRepositoryTest {
   @DisplayName("Debería manejar cliente sin solicitudes pendientes")
   void deberiaManejarClienteSinSolicitudesPendientes() throws SQLException {
     // Arrange
-    when(storedProcedureQuery.registerStoredProcedureParameter(anyString(), any(), any()))
-        .thenReturn(storedProcedureQuery);
-    when(storedProcedureQuery.setParameter(anyString(), any())).thenReturn(storedProcedureQuery);
+    given(storedProcedureQuery.registerStoredProcedureParameter(anyString(), any(), any()))
+        .willReturn(storedProcedureQuery);
+    given(storedProcedureQuery.setParameter(anyString(), any())).willReturn(storedProcedureQuery);
     configurarResultSetCliente();
     configurarResultSetCuentas();
-    when(storedProcedureQuery.getOutputParameterValue("rs3")).thenReturn(solicitudesResultSet);
-    when(solicitudesResultSet.next()).thenReturn(false); // No hay solicitudes
+    given(storedProcedureQuery.getOutputParameterValue("rs3")).willReturn(solicitudesResultSet);
+    given(solicitudesResultSet.next()).willReturn(false); // No hay solicitudes
 
     // Act
     ClienteDetalleDTO resultado = repository.consultarClientePorDNI(DNI_TEST);
@@ -156,11 +157,11 @@ class ClienteStoredProcedureRepositoryTest {
   @DisplayName("Debería manejar SQLException correctamente")
   void deberiaManejarSQLExceptionCorrectamente() throws SQLException {
     // Arrange
-    when(storedProcedureQuery.registerStoredProcedureParameter(anyString(), any(), any()))
-        .thenReturn(storedProcedureQuery);
-    when(storedProcedureQuery.setParameter(anyString(), any())).thenReturn(storedProcedureQuery);
-    when(storedProcedureQuery.getOutputParameterValue("rs1")).thenReturn(clienteResultSet);
-    when(clienteResultSet.next()).thenThrow(new SQLException("Error de base de datos"));
+    given(storedProcedureQuery.registerStoredProcedureParameter(anyString(), any(), any()))
+        .willReturn(storedProcedureQuery);
+    given(storedProcedureQuery.setParameter(anyString(), any())).willReturn(storedProcedureQuery);
+    given(storedProcedureQuery.getOutputParameterValue("rs1")).willReturn(clienteResultSet);
+    given(clienteResultSet.next()).willThrow(new SQLException("Error de base de datos"));
 
     // Act & Assert
     RuntimeException exception = assertThrows(RuntimeException.class, () -> {
@@ -175,7 +176,7 @@ class ClienteStoredProcedureRepositoryTest {
   @DisplayName("Debería manejar excepción general correctamente")
   void deberiaManejarExcepcionGeneralCorrectamente() {
     // Arrange
-    when(entityManager.createStoredProcedureQuery(anyString())).thenThrow(new RuntimeException("Error general"));
+    given(entityManager.createStoredProcedureQuery(anyString())).willThrow(new RuntimeException("Error general"));
 
     // Act & Assert
     RuntimeException exception = assertThrows(RuntimeException.class, () -> {
@@ -190,9 +191,9 @@ class ClienteStoredProcedureRepositoryTest {
   @DisplayName("Debería procesar múltiples cuentas bancarias correctamente")
   void deberiaProcesarMultiplesCuentasBancariasCorrectamente() throws SQLException {
     // Arrange
-    when(storedProcedureQuery.registerStoredProcedureParameter(anyString(), any(), any()))
-        .thenReturn(storedProcedureQuery);
-    when(storedProcedureQuery.setParameter(anyString(), any())).thenReturn(storedProcedureQuery);
+    given(storedProcedureQuery.registerStoredProcedureParameter(anyString(), any(), any()))
+        .willReturn(storedProcedureQuery);
+    given(storedProcedureQuery.setParameter(anyString(), any())).willReturn(storedProcedureQuery);
     configurarResultSetCliente();
     configurarResultSetCuentasMultiples();
     configurarResultSetSolicitudes();
@@ -227,9 +228,9 @@ class ClienteStoredProcedureRepositoryTest {
   @DisplayName("Debería procesar múltiples solicitudes pendientes correctamente")
   void deberiaProcesarMultiplesSolicitudesPendientesCorrectamente() throws SQLException {
     // Arrange
-    when(storedProcedureQuery.registerStoredProcedureParameter(anyString(), any(), any()))
-        .thenReturn(storedProcedureQuery);
-    when(storedProcedureQuery.setParameter(anyString(), any())).thenReturn(storedProcedureQuery);
+    given(storedProcedureQuery.registerStoredProcedureParameter(anyString(), any(), any()))
+        .willReturn(storedProcedureQuery);
+    given(storedProcedureQuery.setParameter(anyString(), any())).willReturn(storedProcedureQuery);
     configurarResultSetCliente();
     configurarResultSetCuentas();
     configurarResultSetSolicitudesMultiples();
@@ -262,49 +263,49 @@ class ClienteStoredProcedureRepositoryTest {
 
   // Métodos auxiliares para configurar los mocks
   private void configurarResultSetCliente() throws SQLException {
-    when(storedProcedureQuery.getOutputParameterValue("rs1")).thenReturn(clienteResultSet);
-    when(clienteResultSet.next()).thenReturn(true);
-    when(clienteResultSet.getString("dni")).thenReturn(DNI_TEST);
-    when(clienteResultSet.getString("nombre")).thenReturn("Juan");
-    when(clienteResultSet.getString("apellido")).thenReturn("Pérez");
-    when(clienteResultSet.getString("email")).thenReturn("juan.perez@email.com");
+    given(storedProcedureQuery.getOutputParameterValue("rs1")).willReturn(clienteResultSet);
+    given(clienteResultSet.next()).willReturn(true);
+    given(clienteResultSet.getString("dni")).willReturn(DNI_TEST);
+    given(clienteResultSet.getString("nombre")).willReturn("Juan");
+    given(clienteResultSet.getString("apellido")).willReturn("Pérez");
+    given(clienteResultSet.getString("email")).willReturn("juan.perez@email.com");
   }
 
   private void configurarResultSetCuentas() throws SQLException {
-    when(storedProcedureQuery.getOutputParameterValue("rs2")).thenReturn(cuentasResultSet);
-    when(cuentasResultSet.next()).thenReturn(true, true, false); // Dos cuentas
-    when(cuentasResultSet.getString("numero_cuenta")).thenReturn("1234567890", "0987654321");
-    when(cuentasResultSet.getString("tipo_cuenta")).thenReturn("Ahorros", "Corriente");
-    when(cuentasResultSet.getDouble("saldo")).thenReturn(5000.0, 15000.0);
+    given(storedProcedureQuery.getOutputParameterValue("rs2")).willReturn(cuentasResultSet);
+    given(cuentasResultSet.next()).willReturn(true, true, false); // Dos cuentas
+    given(cuentasResultSet.getString("numero_cuenta")).willReturn("1234567890", "0987654321");
+    given(cuentasResultSet.getString("tipo_cuenta")).willReturn("Ahorros", "Corriente");
+    given(cuentasResultSet.getDouble("saldo")).willReturn(5000.0, 15000.0);
   }
 
   private void configurarResultSetCuentasMultiples() throws SQLException {
-    when(storedProcedureQuery.getOutputParameterValue("rs2")).thenReturn(cuentasResultSet);
-    when(cuentasResultSet.next()).thenReturn(true, true, true, false); // Tres cuentas
-    when(cuentasResultSet.getString("numero_cuenta")).thenReturn("1234567890", "0987654321", "1122334455");
-    when(cuentasResultSet.getString("tipo_cuenta")).thenReturn("Ahorros", "Corriente", "Plazo fijo");
-    when(cuentasResultSet.getDouble("saldo")).thenReturn(5000.0, 15000.0, 25000.0);
+    given(storedProcedureQuery.getOutputParameterValue("rs2")).willReturn(cuentasResultSet);
+    given(cuentasResultSet.next()).willReturn(true, true, true, false); // Tres cuentas
+    given(cuentasResultSet.getString("numero_cuenta")).willReturn("1234567890", "0987654321", "1122334455");
+    given(cuentasResultSet.getString("tipo_cuenta")).willReturn("Ahorros", "Corriente", "Plazo fijo");
+    given(cuentasResultSet.getDouble("saldo")).willReturn(5000.0, 15000.0, 25000.0);
   }
 
   private void configurarResultSetSolicitudes() throws SQLException {
-    when(storedProcedureQuery.getOutputParameterValue("rs3")).thenReturn(solicitudesResultSet);
-    when(solicitudesResultSet.next()).thenReturn(true, true, false); // Dos solicitudes
-    when(solicitudesResultSet.getString("numero_solicitud")).thenReturn("SOL001", "SOL002");
-    when(solicitudesResultSet.getDate("fecha_solicitud")).thenReturn(
+    given(storedProcedureQuery.getOutputParameterValue("rs3")).willReturn(solicitudesResultSet);
+    given(solicitudesResultSet.next()).willReturn(true, true, false); // Dos solicitudes
+    given(solicitudesResultSet.getString("numero_solicitud")).willReturn("SOL001", "SOL002");
+    given(solicitudesResultSet.getDate("fecha_solicitud")).willReturn(
         Date.valueOf(LocalDate.now().minusDays(5)),
         Date.valueOf(LocalDate.now().minusDays(2)));
-    when(solicitudesResultSet.getString("asunto")).thenReturn("Solicitud de préstamo", "Cambio de dirección");
+    given(solicitudesResultSet.getString("asunto")).willReturn("Solicitud de préstamo", "Cambio de dirección");
   }
 
   private void configurarResultSetSolicitudesMultiples() throws SQLException {
-    when(storedProcedureQuery.getOutputParameterValue("rs3")).thenReturn(solicitudesResultSet);
-    when(solicitudesResultSet.next()).thenReturn(true, true, true, false); // Tres solicitudes
-    when(solicitudesResultSet.getString("numero_solicitud")).thenReturn("SOL001", "SOL002", "SOL003");
-    when(solicitudesResultSet.getDate("fecha_solicitud")).thenReturn(
+    given(storedProcedureQuery.getOutputParameterValue("rs3")).willReturn(solicitudesResultSet);
+    given(solicitudesResultSet.next()).willReturn(true, true, true, false); // Tres solicitudes
+    given(solicitudesResultSet.getString("numero_solicitud")).willReturn("SOL001", "SOL002", "SOL003");
+    given(solicitudesResultSet.getDate("fecha_solicitud")).willReturn(
         Date.valueOf(LocalDate.now().minusDays(5)),
         Date.valueOf(LocalDate.now().minusDays(2)),
         Date.valueOf(LocalDate.now().minusDays(1)));
-    when(solicitudesResultSet.getString("asunto")).thenReturn("Solicitud de préstamo", "Cambio de dirección",
+    given(solicitudesResultSet.getString("asunto")).willReturn("Solicitud de préstamo", "Cambio de dirección",
         "Actualización de datos");
   }
 }
